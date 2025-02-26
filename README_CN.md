@@ -35,8 +35,8 @@
 1. **克隆仓库**
 
 ```bash
-git clone https://github.com/yourusername/home-lab-config.git
-cd home-lab-config
+git clone https://github.com/robinmin/kirin-lab.git
+cd kirin-lab
 ```
 
 2. **配置环境变量**
@@ -63,7 +63,7 @@ cd bootstrap
 ## 📁 目录结构说明
 
 ```
-home-lab-config/           # 项目根目录
+kirin-lab/           	   # 项目根目录
 ├── bootstrap/             # 初始化脚本
 ├── global-env/            # 全局环境变量
 ├── dockge/                # 容器编排管理

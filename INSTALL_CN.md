@@ -22,8 +22,8 @@
 ### 2. 克隆仓库
 
 ```bash
-git clone https://github.com/yourusername/home-lab-config.git
-cd home-lab-config
+git clone https://github.com/robinmin/kirin-lab.git
+cd kirin-lab
 ```
 
 ### 3. 配置外部存储设备

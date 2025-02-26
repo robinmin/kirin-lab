@@ -35,8 +35,8 @@ A complete home server lab based on Mac mini M4, using Docker containerization a
 1. **Clone Repository**
 
 ```bash
-git clone https://github.com/yourusername/home-lab-config.git
-cd home-lab-config
+git clone https://github.com/robinmin/kirin-lab.git
+cd kirin-lab
 ```
 
 2. **Configure Environment Variables**
@@ -63,7 +63,7 @@ After initialization, access the following addresses:
 ## 📁 Directory Structure
 
 ```
-home-lab-config/           # Project root
+kirin-lab/                 # Project root
 ├── bootstrap/             # Initialization scripts
 ├── global-env/            # Global environment variables
 ├── dockge/                # Container orchestration management

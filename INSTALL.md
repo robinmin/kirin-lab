@@ -22,8 +22,8 @@ First, you need to install Docker Desktop for Mac:
 ### 2. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/home-lab-config.git
-cd home-lab-config
+git clone https://github.com/robinmin/kirin-lab.git
+cd kirin-lab
 ```
 
 ### 3. Configure External Storage Devices
