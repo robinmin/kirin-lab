@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - homelab_network
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ${DATA_PATH:-./data}/portainer:/data
+    ports:
+      - 9000:9000
+      - 9443:9443 # HTTPS端口
+    environment:
+      - TZ=${TZ:-Asia/Shanghai}
+    command: --admin-password-file /data/portainer_password
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:9000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period:
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "com.github.dockge.name=portainer"
+      - "com.github.dockge.description=Docker容器管理系统"
+      - "com.github.dockge.icon=https://portainer.io/images/favicon32.png"
+
+networks:
+  homelab_network:
+    name: ${NETWORK_NAME:-homelab_network}
+    driver: bridge
+    ipam:
+      config:
+        - subnet: ${DOCKER_SUBNET:-172.18.0.0/16}

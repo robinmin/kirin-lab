@@ -1,0 +1,132 @@
+version: '3.8'
+
+services:
+  immich-server:
+    image: ghcr.io/immich-app/immich-server:release
+    container_name: immich-server
+    command: ["start.sh", "immich"]
+    restart: unless-stopped
+    networks:
+      - homelab_network
+    volumes:
+      - ${IMMICH_UPLOAD_LOCATION:-${DATA_PATH}/immich/uploads}:/usr/src/app/upload
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - DB_HOSTNAME=immich-postgres
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=${IMMICH_DB_PASSWORD:-change_me_now}
+      - DB_DATABASE_NAME=immich
+      - REDIS_HOSTNAME=immich-redis
+      - UPLOAD_LOCATION=/usr/src/app/upload
+      - TZ=${TZ:-Asia/Shanghai}
+    depends_on:
+      - immich-postgres
+      - immich-redis
+    ports:
+      - 2283:3001
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/server-info/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "com.github.dockge.name=immich-server"
+      - "com.github.dockge.description=照片管理服务器"
+      - "com.github.dockge.icon=https://raw.githubusercontent.com/immich-app/immich/main/web/public/favicon.ico"
+      - "com.github.dockge.web=http://immich.${DOMAINNAME:-home.local}"
+      - "traefik.enable=true"
+      - "traefik.http.routers.immich.rule=Host(`immich.${DOMAINNAME:-home.local}`)"
+      - "traefik.http.routers.immich.entrypoints=websecure"
+      - "traefik.http.routers.immich.tls=true"
+      - "traefik.http.services.immich.loadbalancer.server.port=3001"
+
+  immich-microservices:
+    image: ghcr.io/immich-app/immich-server:release
+    container_name: immich-microservices
+    command: ["start.sh", "microservices"]
+    restart: unless-stopped
+    networks:
+      - homelab_network
+    volumes:
+      - ${IMMICH_UPLOAD_LOCATION:-${DATA_PATH}/immich/uploads}:/usr/src/app/upload
+    environment:
+      - DB_HOSTNAME=immich-postgres
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=${IMMICH_DB_PASSWORD:-change_me_now}
+      - DB_DATABASE_NAME=immich
+      - REDIS_HOSTNAME=immich-redis
+      - UPLOAD_LOCATION=/usr/src/app/upload
+      - TZ=${TZ:-Asia/Shanghai}
+    depends_on:
+      - immich-postgres
+      - immich-redis
+      - immich-server
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "com.github.dockge.name=immich-microservices"
+      - "com.github.dockge.description=Immich微服务（处理缩略图等）"
+
+  immich-machine-learning:
+    image: ghcr.io/immich-app/immich-machine-learning:release
+    container_name: immich-machine-learning
+    restart: unless-stopped
+    networks:
+      - homelab_network
+    volumes:
+      - ${DATA_PATH:-./data}/immich/model-cache:/cache
+    environment:
+      - REDIS_HOSTNAME=immich-redis
+      - CUDA_VISIBLE_DEVICES=
+      - TZ=${TZ:-Asia/Shanghai}
+    depends_on:
+      - immich-redis
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "com.github.dockge.name=immich-machine-learning"
+      - "com.github.dockge.description=Immich机器学习服务（人脸识别等）"
+
+  immich-postgres:
+    image: postgres:14-alpine
+    container_name: immich-postgres
+    restart: unless-stopped
+    networks:
+      - homelab_network
+    volumes:
+      - ${DATA_PATH:-./data}/immich/postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${IMMICH_DB_PASSWORD:-change_me_now}
+      - POSTGRES_DB=immich
+      - TZ=${TZ:-Asia/Shanghai}
+    healthcheck:
+      test: ["CMD", "pg_isready", "-d", "immich", "-U", "postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    labels:
+      - "com.github.dockge.name=immich-postgres"
+      - "com.github.dockge.description=Immich数据库服务"
+
+  immich-redis:
+    image: redis:alpine
+    container_name: immich-redis
+    restart: unless-stopped
+    networks:
+      - homelab_network
+    volumes:
+      - ${DATA_PATH:-./data}/immich/redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    labels:
+      - "com.github.dockge.name=immich-redis"
+      - "com.github.dockge.description=Immich缓存服务"
+
+networks:
+  homelab_network:
+    external: true
+    name: ${NETWORK_NAME:-homelab_network}

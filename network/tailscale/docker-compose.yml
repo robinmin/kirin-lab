@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  tailscale:
+    image: tailscale/tailscale:latest
+    container_name: tailscale
+    restart: unless-stopped
+    networks:
+      - homelab_network
+    volumes:
+      - ${DATA_PATH:-./data}/tailscale:/var/lib/tailscale
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    environment:
+      - TS_AUTHKEY=${TAILSCALE_AUTHKEY}
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_EXTRA_ARGS=--hostname=${HOSTNAME:-mac-mini-m4}
+      - TZ=${TZ:-Asia/Shanghai}
+    healthcheck:
+      test: ["CMD", "tailscale", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "com.github.dockge.name=tailscale"
+      - "com.github.dockge.description=安全内网穿透VPN"
+      - "com.github.dockge.icon=https://tailscale.com/images/tailscale-logo-square.png"
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    networks:
+      - homelab_network
+    command: tunnel run
+    volumes:
+      - ${DATA_PATH:-./data}/cloudflared:/etc/cloudflared
+    environment:
+      - TZ=${TZ:-Asia/Shanghai}
+    healthcheck:
+      test: ["CMD", "cloudflared", "version"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "com.github.dockge.name=cloudflared"
+      - "com.github.dockge.description=Cloudflare Tunnel内网穿透"
+      - "com.github.dockge.icon=https://cdn.jsdelivr.net/gh/cloudflare/cloudflared/cmd/cloudflared/cf-connected.png"
+
+networks:
+  homelab_network:
+    external: true
+    name: ${NETWORK_NAME:-homelab_network}

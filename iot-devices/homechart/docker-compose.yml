@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  homechart:
+    image: ghcr.io/hay-kot/homechart:latest
+    container_name: homechart
+    restart: unless-stopped
+    networks:
+      - homelab_network
+    volumes:
+      - ${DATA_PATH:-./data}/homechart/data:/data
+    environment:
+      - HOMECHART_LOG_LEVEL=info
+      - HOMECHART_DATABASE_PATH=/data/homechart.db
+      - HOMECHART_ADMIN_USERNAME=admin
+      - HOMECHART_ADMIN_PASSWORD=${HOMECHART_PASSWORD:-change_me_now}
+      - HOMECHART_ALLOW_REGISTRATION=false
+      - HOMECHART_TIME_ZONE=${TZ:-Asia/Shanghai}
+      - TZ=${TZ:-Asia/Shanghai}
+    ports:
+      - 3100:7745
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:7745/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "com.github.dockge.name=homechart"
+      - "com.github.dockge.description=家庭管理与任务规划系统"
+      - "com.github.dockge.icon=https://raw.githubusercontent.com/hay-kot/homechart/main/frontend/public/icons/favicon-192x192.png"
+      - "com.github.dockge.web=http://homechart.${DOMAINNAME:-home.local}"
+      - "traefik.enable=true"
+      - "traefik.http.routers.homechart.rule=Host(`homechart.${DOMAINNAME:-home.local}`)"
+      - "traefik.http.routers.homechart.entrypoints=websecure"
+      - "traefik.http.routers.homechart.tls=true"
+      - "traefik.http.services.homechart.loadbalancer.server.port=7745"
+
+networks:
+  homelab_network:
+    external: true
+    name: ${NETWORK_NAME:-homelab_network}

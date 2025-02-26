@@ -1,0 +1,59 @@
+# 敏感配置信息
+.env
+*.env
+*.key
+*.pem
+*.crt
+
+# 数据目录
+**/data/
+**/uploads/
+**/config/
+**/media/
+
+# 密码和令牌文件
+**/passwords.txt
+**/tokens.txt
+**/secrets.yaml
+**/secrets.yml
+**/secret.yaml
+**/secret.yml
+
+# Cloudflare Tunnel配置
+**/cloudflared/*.json
+**/cloudflared/*.yaml
+**/cloudflared/*.yml
+
+# 特定目录排除
+monitoring/prometheus/data/
+monitoring/grafana/data/
+*/postgres/
+*/mysql/
+*/redis/
+
+# macOS系统文件
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# IDE和编辑器
+*.swp
+*.swo
+*.swn
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# 临时文件
+*.tmp
+*.log
+*.bak
+*/tmp/
+logs/

@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  homeassistant:
+    image: ghcr.io/home-assistant/home-assistant:stable
+    container_name: homeassistant
+    restart: unless-stopped
+    privileged: true
+    networks:
+      - homelab_network
+    volumes:
+      - ${HASS_CONFIGDIR:-${DATA_PATH}/homeassistant/config}:/config
+      - /run/dbus:/run/dbus:ro
+    environment:
+      - TZ=${TZ:-Asia/Shanghai}
+    ports:
+      - 8123:8123
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8123"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "com.github.dockge.name=homeassistant"
+      - "com.github.dockge.description=智能家居管理平台"
+      - "com.github.dockge.icon=https://brands.home-assistant.io/homeassistant/icon.png"
+      - "com.github.dockge.web=http://homeassistant.${DOMAINNAME:-home.local}"
+      - "traefik.enable=true"
+      - "traefik.http.routers.homeassistant.rule=Host(`homeassistant.${DOMAINNAME:-home.local}`)"
+      - "traefik.http.routers.homeassistant.entrypoints=websecure"
+      - "traefik.http.routers.homeassistant.tls=true"
+
+  homebridge:
+    image: oznu/homebridge:latest
+    container_name: homebridge
+    restart: unless-stopped
+    networks:
+      - homelab_network
+    volumes:
+      - ${DATA_PATH:-./data}/homebridge:/homebridge
+    environment:
+      - TZ=${TZ:-Asia/Shanghai}
+      - PGID=${PGID:-1000}
+      - PUID=${PUID:-1000}
+      - HOMEBRIDGE_CONFIG_UI=1
+      - HOMEBRIDGE_CONFIG_UI_PORT=8581
+    ports:
+      - 8581:8581
+      - 5353:5353/udp # mDNS
+    depends_on:
+      - homeassistant
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8581"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "com.github.dockge.name=homebridge"
+      - "com.github.dockge.description=HomeKit与HomeAssistant桥接"
+      - "com.github.dockge.icon=https://raw.githubusercontent.com/homebridge/branding/master/logos/homebridge-color-round.png"
+      - "com.github.dockge.web=http://homebridge.${DOMAINNAME:-home.local}"
+      - "traefik.enable=true"
+      - "traefik.http.routers.homebridge.rule=Host(`homebridge.${DOMAINNAME:-home.local}`)"
+      - "traefik.http.routers.homebridge.entrypoints=websecure"
+      - "traefik.http.routers.homebridge.tls=true"
+
+networks:
+  homelab_network:
+    external: true
+    name: ${NETWORK_NAME:-homelab_network}

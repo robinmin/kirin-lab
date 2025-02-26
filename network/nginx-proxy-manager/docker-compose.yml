@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  nginx-proxy-manager:
+    image: 'jc21/nginx-proxy-manager:latest'
+    container_name: nginx-proxy-manager
+    restart: unless-stopped
+    networks:
+      - homelab_network
+    ports:
+      - '80:80'      # HTTP 端口
+      - '81:81'      # 管理UI
+      - '443:443'    # HTTPS 端口
+    volumes:
+      - ${DATA_PATH:-./data}/nginx-proxy-manager/data:/data
+      - ${DATA_PATH:-./data}/nginx-proxy-manager/letsencrypt:/etc/letsencrypt
+    environment:
+      DB_MYSQL_HOST: "nginx-proxy-db"
+      DB_MYSQL_PORT: 3306
+      DB_MYSQL_USER: "npm"
+      DB_MYSQL_PASSWORD: ${MYSQL_ROOT_PASSWORD:-change_me_now}
+      DB_MYSQL_NAME: "npm"
+      DISABLE_IPV6: 'true'
+      TZ: ${TZ:-Asia/Shanghai}
+    depends_on:
+      - nginx-proxy-db
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:81"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "com.github.dockge.name=nginx-proxy-manager"
+      - "com.github.dockge.description=反向代理与SSL证书管理"
+      - "com.github.dockge.icon=https://nginxproxymanager.com/icon.png"
+      - "com.github.dockge.web=http://localhost:81"
+
+  nginx-proxy-db:
+    image: 'yobasystems/alpine-mariadb:latest'
+    container_name: nginx-proxy-db
+    restart: unless-stopped
+    networks:
+      - homelab_network
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-change_me_now}
+      MYSQL_DATABASE: 'npm'
+      MYSQL_USER: 'npm'
+      MYSQL_PASSWORD: ${MYSQL_ROOT_PASSWORD:-change_me_now}
+      TZ: ${TZ:-Asia/Shanghai}
+    volumes:
+      - ${DATA_PATH:-./data}/nginx-proxy-manager/mysql:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 20s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    labels:
+      - "com.github.dockge.name=nginx-proxy-db"
+      - "com.github.dockge.description=Nginx Proxy Manager的数据库"
+
+networks:
+  homelab_network:
+    external: true
+    name: ${NETWORK_NAME:-homelab_network}

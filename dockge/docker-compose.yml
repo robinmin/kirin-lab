@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  dockge:
+    image: louislam/dockge:latest
+    container_name: dockge
+    restart: unless-stopped
+    networks:
+      - homelab_network
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${DATA_PATH:-./data}/dockge/data:/app/data
+      - ${REPO_DIR:-./}/dockge/stacks:/app/stacks
+    ports:
+      - 5001:5001
+    environment:
+      - TZ=${TZ:-Asia/Shanghai}
+      - DOCKGE_ADMIN_PASSWORD=${DOCKGE_PASSWORD:-change_me_now}
+      - UID=${PUID:-1000}
+      - GID=${PGID:-1000}
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:5001"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "com.github.dockge.name=dockge"
+      - "com.github.dockge.description=Docker Compose栈管理器"
+      - "com.github.dockge.icon=https://raw.githubusercontent.com/louislam/dockge/master/frontend/public/icon.svg"
+
+networks:
+  homelab_network:
+    external: true
+    name: ${NETWORK_NAME:-homelab_network}

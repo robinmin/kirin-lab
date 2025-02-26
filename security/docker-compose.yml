@@ -1,0 +1,148 @@
+version: '3.8'
+
+services:
+  crowdsec:
+    image: crowdsecurity/crowdsec:latest
+    container_name: crowdsec
+    restart: unless-stopped
+    networks:
+      - homelab_network
+    volumes:
+      - ${DATA_PATH:-./data}/security/crowdsec/config:/etc/crowdsec
+      - ${DATA_PATH:-./data}/security/crowdsec/data:/var/lib/crowdsec/data
+      - /var/log:/var/log:ro
+    ports:
+      - 6060:6060     # API
+    environment:
+      - TZ=${TZ:-Asia/Shanghai}
+      - COLLECTIONS=crowdsecurity/nginx crowdsecurity/http-cve
+    healthcheck:
+      test: ["CMD", "cscli", "metrics"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "com.github.dockge.name=crowdsec"
+      - "com.github.dockge.description=分布式安全检测系统"
+      - "com.github.dockge.icon=https://docs.crowdsec.net/img/crowdsec_logo.png"
+
+  crowdsec-bouncer:
+    image: crowdsecurity/bouncer-traefik:latest
+    container_name: crowdsec-bouncer
+    restart: unless-stopped
+    networks:
+      - homelab_network
+    depends_on:
+      - crowdsec
+    environment:
+      - TZ=${TZ:-Asia/Shanghai}
+      - CROWDSEC_BOUNCER_API_KEY=CHANGE_THIS_KEY_AFTER_SETUP
+      - CROWDSEC_AGENT_HOST=crowdsec:8080
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "com.github.dockge.name=crowdsec-bouncer"
+      - "com.github.dockge.description=CrowdSec拦截器"
+
+  fail2ban:
+    image: crazymax/fail2ban:latest
+    container_name: fail2ban
+    restart: unless-stopped
+    networks:
+      - homelab_network
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    volumes:
+      - ${DATA_PATH:-./data}/security/fail2ban/config:/etc/fail2ban
+      - /var/log:/var/log:ro
+    environment:
+      - TZ=${TZ:-Asia/Shanghai}
+      - F2B_DB_PURGE_AGE=7d
+      - F2B_LOG_TARGET=STDOUT
+      - F2B_LOG_LEVEL=INFO
+    healthcheck:
+      test: ["CMD", "fail2ban-client", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "com.github.dockge.name=fail2ban"
+      - "com.github.dockge.description=入侵防御系统"
+
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    restart: unless-stopped
+    networks:
+      - homelab_network
+    volumes:
+      - ${DATA_PATH:-./data}/vaultwarden/data:/data
+    environment:
+      - WEBSOCKET_ENABLED=true
+      - SIGNUPS_ALLOWED=false
+      - TZ=${TZ:-Asia/Shanghai}
+      - DOMAIN=https://vault.${DOMAINNAME:-home.local}
+      - ADMIN_TOKEN=${VAULTWARDEN_ADMIN_TOKEN:-change_me_now}
+    ports:
+      - 8181:80
+      - 3012:3012  # WebSocket
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/alive"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "com.github.dockge.name=vaultwarden"
+      - "com.github.dockge.description=密码管理系统"
+      - "com.github.dockge.icon=https://raw.githubusercontent.com/dani-garcia/vaultwarden/main/resources/icon-128x128.png"
+      - "com.github.dockge.web=http://vault.${DOMAINNAME:-home.local}"
+      - "traefik.enable=true"
+      - "traefik.http.routers.vaultwarden.rule=Host(`vault.${DOMAINNAME:-home.local}`)"
+      - "traefik.http.routers.vaultwarden.entrypoints=websecure"
+      - "traefik.http.routers.vaultwarden.tls=true"
+      - "traefik.http.services.vaultwarden.loadbalancer.server.port=80"
+
+  adguard:
+    image: adguard/adguardhome:latest
+    container_name: adguard
+    restart: unless-stopped
+    networks:
+      - homelab_network
+    volumes:
+      - ${DATA_PATH:-./data}/adguard/work:/opt/adguardhome/work
+      - ${DATA_PATH:-./data}/adguard/conf:/opt/adguardhome/conf
+    ports:
+      - 53:53/tcp
+      - 53:53/udp
+      - 8082:80/tcp    # Web界面
+      - 3000:3000/tcp  # 管理界面
+    environment:
+      - TZ=${TZ:-Asia/Shanghai}
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "com.github.dockge.name=adguard"
+      - "com.github.dockge.description=DNS服务器与广告过滤"
+      - "com.github.dockge.icon=https://cdn.adguard.com/website/adguard-home.png"
+      - "com.github.dockge.web=http://adguard.${DOMAINNAME:-home.local}"
+      - "traefik.enable=true"
+      - "traefik.http.routers.adguard.rule=Host(`adguard.${DOMAINNAME:-home.local}`)"
+      - "traefik.http.routers.adguard.entrypoints=websecure"
+      - "traefik.http.routers.adguard.tls=true"
+      - "traefik.http.services.adguard.loadbalancer.server.port=80"
+
+networks:
+  homelab_network:
+    external: true
+    name: ${NETWORK_NAME:-homelab_network}
