@@ -1,3 +1,5 @@
+dockge/stacks/
+
 # 敏感配置信息
 .env
 *.env
