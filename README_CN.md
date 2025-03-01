@@ -42,7 +42,7 @@ cd kirin-lab
 2. **配置环境变量**
 
 ```bash
-cp env.example .env
+cp bootstrap/env.example .env
 # 编辑 .env 文件设置你的环境变量
 ```
 
@@ -50,7 +50,7 @@ cp env.example .env
 
 ```bash
 cd bootstrap
-./setup.sh
+sudo ./setup.sh
 ```
 
 4. **访问管理界面**

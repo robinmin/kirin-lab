@@ -42,7 +42,7 @@ cd kirin-lab
 2. **Configure Environment Variables**
 
 ```bash
-cp env.example .env
+cp bootstrap/env.example .env
 # Edit .env file to set your environment variables
 ```
 
@@ -50,7 +50,7 @@ cp env.example .env
 
 ```bash
 cd bootstrap
-./setup.sh
+sudo ./setup.sh
 ```
 
 4. **Access Management Interfaces**
