@@ -12,15 +12,11 @@ NC='\033[0m' # No Color
 
 # 获取脚本所在目录的绝对路径
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-echo -e "CRIPT_DIR = ${SCRIPT_DIR}"
 
 # 定义服务的docker-compose文件路径
 PORTAINER_COMPOSE="$(dirname ${SCRIPT_DIR})/bootstrap/portainer-docker-compose.yml"
 DOCKGE_COMPOSE="$(dirname ${SCRIPT_DIR})/dockge/docker-compose.yml"
 NPM_COMPOSE="$(dirname ${SCRIPT_DIR})/network/nginx-proxy-manager/docker-compose.yml"
-echo -e "PORTAINER_COMPOSE = ${PORTAINER_COMPOSE}"
-echo -e "DOCKGE_COMPOSE = ${DOCKGE_COMPOSE}"
-echo -e "NPM_COMPOSE = ${NPM_COMPOSE}"
 
 # 检查.env文件是否存在
 ENV_FILE="$(dirname ${SCRIPT_DIR})/.env"
