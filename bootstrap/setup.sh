@@ -77,13 +77,13 @@ fi
 # 启动基础服务
 echo -e "${YELLOW}启动基础服务...${NC}"
 echo -e "${YELLOW}1. 启动Portainer...${NC}"
-docker-compose -f bootstrap/portainer-docker-compose.yml up -d
+docker-compose --env-file ./.env -f bootstrap/portainer-docker-compose.yml up -d
 
 echo -e "${YELLOW}2. 启动Dockge...${NC}"
-docker-compose -f dockge/docker-compose.yml up -d
+docker-compose --env-file ./.env -f dockge/docker-compose.yml up -d
 
 echo -e "${YELLOW}3. 启动Nginx Proxy Manager...${NC}"
-docker-compose -f network/nginx-proxy-manager/docker-compose.yml up -d
+docker-compose --env-file ./.env -f network/nginx-proxy-manager/docker-compose.yml up -d
 
 # 创建软链接
 echo -e "${YELLOW}创建服务软链接到Dockge...${NC}"

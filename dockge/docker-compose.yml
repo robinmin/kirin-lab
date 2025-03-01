@@ -1,4 +1,4 @@
-version: '3.8'
+# version: '3.8'
 
 services:
   dockge:
@@ -13,11 +13,11 @@ services:
       - ${REPO_DIR:-./}/dockge/stacks:/app/stacks
     ports:
       - 5001:5001
-    environment:
-      - TZ=${TZ:-Asia/Shanghai}
-      - DOCKGE_ADMIN_PASSWORD=${DOCKGE_PASSWORD:-change_me_now}
-      - UID=${PUID:-1000}
-      - GID=${PGID:-1000}
+    env_file:
+      - ../.env
+    # environment:
+    #   - UID=${PUID:-1000}
+    #   - GID=${PGID:-1000}
     healthcheck:
       test: ["CMD", "wget", "--spider", "http://localhost:5001"]
       interval: 30s

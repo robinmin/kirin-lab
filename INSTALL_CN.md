@@ -50,8 +50,7 @@ cp bootstrap/env.example .env
 ### 5. 运行安装脚本
 
 ```bash
-cd bootstrap
-sudo ./setup.sh
+sudo ./bootstrap/setup.sh
 ```
 
 安装脚本将创建必要的目录结构并启动核心服务。
