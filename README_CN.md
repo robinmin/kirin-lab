@@ -1,4 +1,4 @@
-# Mac mini M4 Home Lab 🏠🧪
+# Kirin Lab 🏠🧪
 
 基于Mac mini M4打造的完整家庭服务器实验室，使用Docker容器化技术和自动化配置管理。
 
@@ -119,3 +119,7 @@ MIT License
 3. 提交你的更改
 4. 推送到分支
 5. 创建新的Pull Request
+
+
+## 参考
+- [Original Prompt on Claude.ai](https://claude.ai/share/146be25e-5574-4a09-82e9-23a75ade1a21)

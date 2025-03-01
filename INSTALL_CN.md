@@ -1,4 +1,4 @@
-# Mac mini M4 Home Lab 安装指南
+# Kirin Lab 安装指南
 
 本指南将帮助你在Mac mini M4上安装和配置完整的Home Lab环境。
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Mac mini M4 Home Lab 初始化脚本
+# Kirin Lab 初始化脚本
 #
 
 # 颜色定义
@@ -18,7 +18,7 @@ fi
 
 # 显示欢迎信息
 echo -e "${GREEN}============================================${NC}"
-echo -e "${GREEN}    Mac mini M4 Home Lab 初始化脚本    ${NC}"
+echo -e "${GREEN}    Kirin Lab 初始化脚本    ${NC}"
 echo -e "${GREEN}============================================${NC}"
 echo ""
 
@@ -36,7 +36,7 @@ echo ""
 # 检查外部存储设备
 echo -e "${YELLOW}检查外部存储设备...${NC}"
 # 列出所有卷
-diskutil list | grep -E 'external|媒体'
+diskutil list | grep -E 'external'
 echo ""
 echo -e "${YELLOW}请确认以上列出的外部存储设备是否正确挂载${NC}"
 read -p "是否继续? (y/n) " -n 1 -r
@@ -103,7 +103,7 @@ find . -type f -name "*.sh" -exec chmod +x {} \;
 # 显示完成信息
 echo ""
 echo -e "${GREEN}============================================${NC}"
-echo -e "${GREEN}    Mac mini M4 Home Lab 初始化完成!    ${NC}"
+echo -e "${GREEN}    Kirin Lab 初始化完成!    ${NC}"
 echo -e "${GREEN}============================================${NC}"
 echo ""
 echo -e "${YELLOW}管理界面:${NC}"

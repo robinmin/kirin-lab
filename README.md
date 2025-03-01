@@ -1,4 +1,4 @@
-# Mac mini M4 Home Lab 🏠🧪
+# Kirin Lab 🏠🧪
 
 A complete home server lab based on Mac mini M4, using Docker containerization and automated configuration management.
 
