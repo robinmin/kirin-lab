@@ -10,14 +10,16 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ${DATA_PATH:-./data}/dockge/data:/app/data
-      - ${REPO_DIR:-./}/dockge/stacks:/app/stacks
+      - ${REPO_DIR:-./}/dockge/stacks:/opt/stacks
     ports:
       - 5001:5001
     env_file:
       - ../.env
-    # environment:
-    #   - UID=${PUID:-1000}
-    #   - GID=${PGID:-1000}
+    environment:
+      - UID=${PUID:-1000}
+      - GID=${PGID:-1000}
+      # Tell Dockge where is your stacks directory
+      - DOCKGE_STACKS_DIR=${REPO_DIR:-./}/dockge/stacks
     healthcheck:
       test: ["CMD", "wget", "--spider", "http://localhost:5001"]
       interval: 30s

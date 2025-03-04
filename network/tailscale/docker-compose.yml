@@ -1,4 +1,4 @@
-version: '3.8'
+# version: "3.8"
 
 services:
   tailscale:
@@ -13,6 +13,8 @@ services:
     cap_add:
       - NET_ADMIN
       - NET_RAW
+    env_file:
+      - ../../.env
     environment:
       - TS_AUTHKEY=${TAILSCALE_AUTHKEY}
       - TS_STATE_DIR=/var/lib/tailscale

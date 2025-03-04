@@ -16,7 +16,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # 定义服务的docker-compose文件路径
 PORTAINER_COMPOSE="$(dirname ${SCRIPT_DIR})/bootstrap/portainer-docker-compose.yml"
 DOCKGE_COMPOSE="$(dirname ${SCRIPT_DIR})/dockge/docker-compose.yml"
-NPM_COMPOSE="$(dirname ${SCRIPT_DIR})/network/nginx-proxy-manager/docker-compose.yml"
+TRAEFIK_COMPOSE="$(dirname ${SCRIPT_DIR})/network/traefik/docker-compose.yml"
 
 # 检查.env文件是否存在
 ENV_FILE="$(dirname ${SCRIPT_DIR})/.env"
@@ -53,13 +53,13 @@ show_help() {
     echo -e "服务:"
     echo -e "  ${BLUE}portainer${NC}   Portainer容器管理界面"
     echo -e "  ${BLUE}dockge${NC}      Dockge Docker Compose管理"
-    echo -e "  ${BLUE}npm${NC}         Nginx Proxy Manager"
+    echo -e "  ${BLUE}traefik${NC}     Traefik"
     echo -e "  ${BLUE}all${NC}         所有核心服务 (默认)"
     echo -e ""
     echo -e "示例:"
     echo -e "  $0 start            # 启动所有服务"
     echo -e "  $0 stop portainer   # 仅停止Portainer"
-    echo -e "  $0 restart npm      # 重启Nginx Proxy Manager"
+    echo -e "  $0 restart traefik  # 重启Traefik"
     echo -e "  $0 status           # 查看所有服务状态"
     echo -e "  $0 logs dockge      # 查看Dockge日志"
 }
@@ -80,9 +80,9 @@ handle_service() {
             compose_file=$DOCKGE_COMPOSE
             service_name="Dockge"
             ;;
-        "npm")
-            compose_file=$NPM_COMPOSE
-            service_name="Nginx Proxy Manager"
+        "traefik")
+            compose_file=$TRAEFIK_COMPOSE
+            service_name="Traefik"
             ;;
         *)
             echo -e "${RED}未知服务: $service${NC}"
@@ -129,12 +129,12 @@ handle_all_services() {
             echo -e "${YELLOW}启动所有核心服务...${NC}"
             docker-compose --env-file "${ENV_FILE}" -f $PORTAINER_COMPOSE up -d
             docker-compose --env-file "${ENV_FILE}" -f $DOCKGE_COMPOSE up -d
-            docker-compose --env-file "${ENV_FILE}" -f $NPM_COMPOSE up -d
+            docker-compose --env-file "${ENV_FILE}" -f $TRAEFIK_COMPOSE up -d
             echo -e "${GREEN}所有服务已启动!${NC}"
             ;;
         "stop")
             echo -e "${YELLOW}停止所有核心服务...${NC}"
-            docker-compose --env-file "${ENV_FILE}" -f $NPM_COMPOSE down
+            docker-compose --env-file "${ENV_FILE}" -f $TRAEFIK_COMPOSE down
             docker-compose --env-file "${ENV_FILE}" -f $DOCKGE_COMPOSE down
             docker-compose --env-file "${ENV_FILE}" -f $PORTAINER_COMPOSE down
             echo -e "${GREEN}所有服务已停止!${NC}"
@@ -143,7 +143,7 @@ handle_all_services() {
             echo -e "${YELLOW}重启所有核心服务...${NC}"
             docker-compose --env-file "${ENV_FILE}" -f $PORTAINER_COMPOSE restart
             docker-compose --env-file "${ENV_FILE}" -f $DOCKGE_COMPOSE restart
-            docker-compose --env-file "${ENV_FILE}" -f $NPM_COMPOSE restart
+            docker-compose --env-file "${ENV_FILE}" -f $TRAEFIK_COMPOSE restart
             echo -e "${GREEN}所有服务已重启!${NC}"
             ;;
         "status")
@@ -151,8 +151,8 @@ handle_all_services() {
             docker-compose --env-file "${ENV_FILE}" -f $PORTAINER_COMPOSE ps
             echo -e "\n${YELLOW}Dockge 状态:${NC}"
             docker-compose --env-file "${ENV_FILE}" -f $DOCKGE_COMPOSE ps
-            echo -e "\n${YELLOW}Nginx Proxy Manager 状态:${NC}"
-            docker-compose --env-file "${ENV_FILE}" -f $NPM_COMPOSE ps
+            echo -e "\n${YELLOW}Traefik 状态:${NC}"
+            docker-compose --env-file "${ENV_FILE}" -f $TRAEFIK_COMPOSE ps
             ;;
         "logs")
             echo -e "${RED}请为logs命令指定具体服务${NC}"
@@ -178,8 +178,8 @@ check_first_run() {
         # 创建数据目录
         mkdir -p "${portainer_data_dir}"
         mkdir -p "$(dirname "$portainer_data_dir")/dockge/data"
-        mkdir -p "$(dirname "$portainer_data_dir")/nginx-proxy-manager/data"
-        mkdir -p "$(dirname "$portainer_data_dir")/nginx-proxy-manager/letsencrypt"
+        mkdir -p "$(dirname "$portainer_data_dir")/traefik/config"
+        mkdir -p "$(dirname "$portainer_data_dir")/traefik/letsencrypt"
 
         # 设置Portainer密码
         local portainer_password=$(grep "PORTAINER_PASSWORD" "${ENV_FILE}" | cut -d '=' -f2 | sed 's/[ \t]*$//')
