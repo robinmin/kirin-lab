@@ -13,7 +13,7 @@
 - **媒体中心**: Jellyfin + Kodi
 - **智能家居**: Home Assistant + HomeKit
 - **内网穿透**: Tailscale + Cloudflare Tunnel
-- **反向代理**: Nginx Proxy Manager
+- **反向代理**: Traefik
 - **家庭管理**: Homechart
 - **照片管理**: Immich
 - **监控系统**: Prometheus + Grafana
@@ -58,14 +58,13 @@ sudo ./setup.sh
 初始化完成后，访问以下地址:
 - Portainer: http://localhost:9000
 - Dockge: http://localhost:5001
-- Nginx Proxy Manager: http://localhost:81
+- Traefik: http://localhost:8080
 
 ## 📁 目录结构说明
 
 ```
 kirin-lab/           	   # 项目根目录
 ├── bootstrap/             # 初始化脚本
-├── global-env/            # 全局环境变量
 ├── dockge/                # 容器编排管理
 ├── core-services/         # 核心服务
 ├── network/               # 网络服务
@@ -96,7 +95,7 @@ kirin-lab/           	   # 项目根目录
 | Jellyfin | 高(转码时) | 2-4GB | 视媒体库大小 |
 | Home Assistant | 低 | 1GB | 500MB-1GB |
 | Tailscale | 极低 | 100MB | 极少 |
-| Nginx Proxy | 低 | 500MB | 100MB |
+| Traefik | 低 | 500MB | 100MB |
 | Immich | 中-高 | 2GB+ | 视照片库大小 |
 
 ## 🔐 安全考虑

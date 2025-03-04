@@ -13,7 +13,7 @@ A complete home server lab based on Mac mini M4, using Docker containerization a
 - **Media Center**: Jellyfin + Kodi
 - **Smart Home**: Home Assistant + HomeKit
 - **Remote Access**: Tailscale + Cloudflare Tunnel
-- **Reverse Proxy**: Nginx Proxy Manager
+- **Reverse Proxy**: Traefik
 - **Home Management**: Homechart
 - **Photo Management**: Immich
 - **Monitoring System**: Prometheus + Grafana
@@ -58,14 +58,13 @@ sudo ./setup.sh
 After initialization, access the following addresses:
 - Portainer: http://localhost:9000
 - Dockge: http://localhost:5001
-- Nginx Proxy Manager: http://localhost:81
+- Traefik: http://localhost:8080
 
 ## 📁 Directory Structure
 
 ```
 kirin-lab/                 # Project root
 ├── bootstrap/             # Initialization scripts
-├── global-env/            # Global environment variables
 ├── dockge/                # Container orchestration management
 ├── core-services/         # Core services
 ├── network/               # Network services
@@ -96,7 +95,7 @@ kirin-lab/                 # Project root
 | Jellyfin | High (when transcoding) | 2-4GB | Depends on media library |
 | Home Assistant | Low | 1GB | 500MB-1GB |
 | Tailscale | Very Low | 100MB | Minimal |
-| Nginx Proxy | Low | 500MB | 100MB |
+| Traefik | Low | 500MB | 100MB |
 | Immich | Medium-High | 2GB+ | Depends on photo library |
 
 ## 🔐 Security Considerations

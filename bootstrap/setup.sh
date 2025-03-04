@@ -51,14 +51,13 @@ echo -e "${YELLOW}创建目录结构...${NC}"
 REPO_DIR=$(dirname $(dirname $(realpath $0)))
 cd $REPO_DIR
 
-mkdir -p global-env
 mkdir -p bootstrap
 mkdir -p dockge/stacks
 mkdir -p core-services/{nextcloud,jellyfin,vaultwarden,immich}/{config,data}
 mkdir -p core-services/jellyfin/media
 mkdir -p core-services/immich/{uploads,postgres}
 mkdir -p network/tailscale
-mkdir -p network/nginx-proxy-manager/{data,letsencrypt}
+mkdir -p network/traefik/{config,letsencrypt}
 mkdir -p iot-devices/{homeassistant,homechart}/{config,data}
 mkdir -p iot-devices/stf/devices
 mkdir -p monitoring/{grafana,prometheus}/{config,data}
@@ -82,8 +81,8 @@ docker-compose --env-file ./.env -f bootstrap/portainer-docker-compose.yml up -d
 echo -e "${YELLOW}2. 启动Dockge...${NC}"
 docker-compose --env-file ./.env -f dockge/docker-compose.yml up -d
 
-echo -e "${YELLOW}3. 启动Nginx Proxy Manager...${NC}"
-docker-compose --env-file ./.env -f network/nginx-proxy-manager/docker-compose.yml up -d
+echo -e "${YELLOW}3. 启动Traefik...${NC}"
+docker-compose --env-file ./.env -f network/traefik/docker-compose.yml up -d
 
 # 创建软链接
 echo -e "${YELLOW}创建服务软链接到Dockge...${NC}"
@@ -109,11 +108,11 @@ echo ""
 echo -e "${YELLOW}管理界面:${NC}"
 echo -e "Portainer:   http://localhost:9000"
 echo -e "Dockge:      http://localhost:5001"
-echo -e "Nginx Proxy: http://localhost:81"
+echo -e "Traefik:     http://localhost:8080"
 echo ""
 echo -e "${YELLOW}后续步骤:${NC}"
 echo -e "1. 编辑 .env 文件配置环境变量"
 echo -e "2. 使用Dockge部署各服务"
-echo -e "3. 配置Nginx Proxy Manager设置反向代理"
+echo -e "3. 配置Traefik设置反向代理"
 echo ""
 echo -e "${GREEN}感谢使用本安装脚本!${NC}"

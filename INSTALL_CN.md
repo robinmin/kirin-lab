@@ -61,13 +61,13 @@ sudo ./bootstrap/setup.sh
 
 - Portainer: [http://localhost:9000](http://localhost:9000)
 - Dockge: [http://localhost:5001](http://localhost:5001)
-- Nginx Proxy Manager: [http://localhost:81](http://localhost:81)
+- Traefik: [http://localhost:8080](http://localhost:8080)
 
 ### 7. 启动服务
 
 1. 登录Dockge管理界面
 2. 逐个部署以下服务组：
-   - 基础服务（Portainer, Dockge, Nginx Proxy Manager）
+   - 基础服务（Portainer, Dockge)
    - 网络服务（Traefik, Tailscale, Cloudflared）
    - 核心服务（Nextcloud, Jellyfin, Vaultwarden, Immich）
    - 安全服务（Crowdsec, Fail2ban, AdGuard Home）
@@ -75,12 +75,9 @@ sudo ./bootstrap/setup.sh
    - 备份服务（Duplicati）
    - 智能家居服务（Home Assistant, Homebridge, Homechart）
 
-### 8. 配置Nginx Proxy Manager
+### 8. 配置Traefik反向代理
 
-1. 访问 [http://localhost:81](http://localhost:81)
-2. 使用默认凭据登录（admin@example.com / changeme）
-3. 添加反向代理，指向各个服务
-4. 为本地域名添加SSL证书
+1. 访问 [http://localhost:8080](http://localhost:8080)
 
 ### 9. 配置Tailscale访问
 

@@ -62,13 +62,13 @@ After initialization, access the following addresses:
 
 - Portainer: [http://localhost:9000](http://localhost:9000)
 - Dockge: [http://localhost:5001](http://localhost:5001)
-- Nginx Proxy Manager: [http://localhost:81](http://localhost:81)
+- Traefik: [http://localhost:8080](http://localhost:8080)
 
 ### 7. Launch Services
 
 1. Log in to the Dockge management interface
 2. Deploy each service group one by one:
-   - Basic services (Portainer, Dockge, Nginx Proxy Manager)
+   - Basic services (Portainer, Dockge)
    - Network services (Traefik, Tailscale, Cloudflared)
    - Core services (Nextcloud, Jellyfin, Vaultwarden, Immich)
    - Security services (Crowdsec, Fail2ban, AdGuard Home)
@@ -76,12 +76,9 @@ After initialization, access the following addresses:
    - Backup services (Duplicati)
    - Smart home services (Home Assistant, Homebridge, Homechart)
 
-### 8. Configure Nginx Proxy Manager
+### 8. Configure Traefik Reverse Proxy
 
-1. Visit [http://localhost:81](http://localhost:81)
-2. Log in with default credentials (admin@example.com / changeme)
-3. Add reverse proxies pointing to various services
-4. Add SSL certificates for local domain names
+1. Visit [http://localhost:8080](http://localhost:8080)
 
 ### 9. Configure Tailscale Access
 
